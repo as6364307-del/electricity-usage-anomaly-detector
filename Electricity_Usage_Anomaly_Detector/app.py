@@ -311,3 +311,34 @@ if not flagged.empty:
     )
 
 ax
+# Electricity Consumption Graph
+st.subheader("Electricity Consumption Over Time")
+
+if "timestamp" in df.columns and "consumption_kwh" in df.columns:
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+    df = df.dropna(subset=["timestamp", "consumption_kwh"])
+    df = df.sort_values("timestamp")
+
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.plot(df["timestamp"], df["consumption_kwh"], marker="o")
+    ax.set_xlabel("Date and Time")
+    ax.set_ylabel("Consumption (kWh)")
+    ax.set_title("Electricity Usage")
+    ax.tick_params(axis="x", rotation=45)
+    fig.tight_layout()
+    st.pyplot(fig)
+    plt.close(fig)
+
+    # Daily Consumption Graph
+    st.subheader("Daily Electricity Consumption")
+    daily = df.set_index("timestamp")["consumption_kwh"].resample("D").sum()
+
+    fig2, ax2 = plt.subplots(figsize=(12, 4))
+    ax2.bar(daily.index, daily.values)
+    ax2.set_xlabel("Date")
+    ax2.set_ylabel("Total Consumption (kWh)")
+    fig2.tight_layout()
+    st.pyplot(fig2)
+    plt.close(fig2)
+else:
+    st.warning("Required columns 'timestamp' and 'consumption_kwh' were not found.")
